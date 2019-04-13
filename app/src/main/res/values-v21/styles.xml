@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="SwitchTheme" parent="Theme.AppCompat.Light">
+        <item name="android:colorControlActivated">#00001a</item>
+        <item name="colorSwitchThumbNormal">#006600</item>
+        <item name="android:colorForeground">#006600</item>
+    </style>
+</resources>
