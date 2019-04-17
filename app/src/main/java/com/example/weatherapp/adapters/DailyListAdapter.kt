@@ -2,6 +2,7 @@ package com.example.weatherapp.adapters
 
 import android.support.constraint.ConstraintLayout
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SwitchCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import com.example.weatherapp.responses.DailyForecast
 
 class DailyListAdapter : RecyclerView.Adapter<DailyListAdapter.ViewHolder>() {
 
+    lateinit var temperatureConverterButton2: SwitchCompat
     var results: List<DailyForecast>? = emptyList()
         set(value) {
             field = value
@@ -44,7 +46,7 @@ class DailyListAdapter : RecyclerView.Adapter<DailyListAdapter.ViewHolder>() {
             position,
             viewHolder.minTemperaturaTextViewListItem,
             viewHolder.maxTemperaturaTextViewListItem,
-            prefs!!.celsiusOrFahrenheit
+            temperatureConverterButton2.isChecked
         )
         setWeatherDescription(results, position, viewHolder.pershkrimiMotitTextViewListItem)
         setTheIconImage(results, position, viewHolder.iconImageViewListItem, viewHolder.itemView.context)

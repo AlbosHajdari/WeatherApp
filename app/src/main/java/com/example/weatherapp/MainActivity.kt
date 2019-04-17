@@ -15,52 +15,71 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
-    val THE_API_KEY: String = "VejmG2NDnVAmqS2l0pRabzM5ZldNOilF"
+    val THE_API_KEY: String = "11CRmW4yNP4icQrfiEcKaWVvXy0ocbA0"
     var rezultatet: List<DailyForecast>? = null
+    var cities: ArrayList<City>? = null
     var prefs: AppPreferences? = null
+    lateinit var adapterOne: DailyListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        addCities()
+
         prefs = AppPreferences(applicationContext)
-
-
-        if (prefs!!.celsiusOrFahrenheit.equals("")) {
-            prefs!!.celsiusOrFahrenheit = celsius!!
-            temperatureConverterButton.isChecked = false
-        } else {
-            if (prefs!!.celsiusOrFahrenheit.equals(celsius!!)) {
-                temperatureConverterButton.isChecked = false
-            } else {
-                temperatureConverterButton.isChecked = true
-            }
-        }
+        temperatureConverterButton.isChecked = prefs!!.celsiusOrFahrenheit
 
         getTheResponseBody()
 
-        temperatureConverterButton.setOnCheckedChangeListener { whatIsThis, isChecked ->
-            run {
-                if (temperatureConverterButton.isChecked) {
-                    prefs!!.celsiusOrFahrenheit = fahrenheit!!
-                } else {
-                    prefs!!.celsiusOrFahrenheit = celsius!!
-                }
+        temperatureConverterButton.setOnCheckedChangeListener { whatIsThis, isChecked -> run {
                 setTemperature(
                     rezultatet,
                     0,
                     minTemperaturaTextView,
                     maxTemperaturaTextView,
-                    prefs!!.celsiusOrFahrenheit
+                    isChecked
                 )
                 adapterOne.notifyDataSetChanged()
             }
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle?) {
+        prefs!!.celsiusOrFahrenheit = temperatureConverterButton.isChecked
+        super.onSaveInstanceState(outState)
+    }
+
+    private fun addCities() {
+
+        var prishtina = City("Prishtina", "298740")
+        var tirana = City("Tirana", "6522")
+        var shkupi = City("Skopje", "227397")
+        var roma = City("Rome", "213490")
+        var berlini = City("Berlin", "178087")
+        var newyorku = City("New York", "349727")
+        var londra = City("London", "328328")
+        var stokholmi = City("Stockholm", "314929")
+
+        cities = ArrayList<City>()
+        cities!!.add(prishtina)
+        cities!!.add(tirana)
+        cities!!.add(shkupi)
+        cities!!.add(roma)
+        cities!!.add(berlini)
+        cities!!.add(newyorku)
+        cities!!.add(londra)
+        cities!!.add(stokholmi)
+
+        var qytetiGjetur = cities!!.find { it.cityKey.equals(prefs!!.lastCityKey) }
+
+        println("EMRI I QYTETIT = " + qytetiGjetur!!.cityName)
+        println("KEY I QYTETIT = " +qytetiGjetur.cityKey)
+    }
+
     private fun getTheResponseBody() {
         var call = retrofit.create(ApiService::class.java)
-            .getForecast(THE_API_KEY)
+            .getForecast("298740",THE_API_KEY)
 
         call.enqueue(object : Callback<ResponseBody> {
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
@@ -68,7 +87,10 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                println("MESAZHI = " + response.message())
+                println("KODI = " + response.code())
                 rezultatet = response.body()!!.dailyForecasts
+
 
                 setDayAndDate(rezultatet, 0, dataDheDitaTextView)
                 setTemperature(
@@ -76,7 +98,7 @@ class MainActivity : AppCompatActivity() {
                     0,
                     minTemperaturaTextView,
                     maxTemperaturaTextView,
-                    prefs!!.celsiusOrFahrenheit
+                    temperatureConverterButton.isChecked
                 )
                 setWeatherDescription(rezultatet, 0, pershkrimiMotitTextView)
                 setTheIconImage(rezultatet, 0, iconImageView, applicationContext)
@@ -100,8 +122,7 @@ class MainActivity : AppCompatActivity() {
         layoutManager.spanSizeLookup = lookup
         adapterOne = DailyListAdapter()
         adapterOne.results = rezultatet
+        adapterOne.temperatureConverterButton2 = temperatureConverterButton
         homeReycler.adapter = adapterOne
     }
-
-    lateinit var adapterOne: DailyListAdapter
 }

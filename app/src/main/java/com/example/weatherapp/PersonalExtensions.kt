@@ -50,10 +50,11 @@ fun setTemperature(
     position: Int,
     minTemperatureTextView: TextView,
     maxTemperatureTextView: TextView,
-    celsiusOrFahrenheit: String
+    celsiusOrFahrenheit: Boolean
 ) {
-    if (!(rezultatet!!.get(0).temperature!!.minimum!!.unit.equals(celsiusOrFahrenheit))) {
-        if (celsiusOrFahrenheit.equals(fahrenheit)) {
+    if((rezultatet!!.get(0).temperature!!.minimum!!.unit.equals(celsius) and celsiusOrFahrenheit.equals(true)) or
+                (rezultatet!!.get(0).temperature!!.minimum!!.unit.equals(fahrenheit) and celsiusOrFahrenheit.equals(false))) {
+        if (celsiusOrFahrenheit) {
             changeValueAndUnitToFahrenheit(rezultatet)
         } else {
             changeValueAndUnitToCelsius(rezultatet)
