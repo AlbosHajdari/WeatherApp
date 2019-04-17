@@ -1,8 +1,13 @@
 package com.example.weatherapp
 
+import android.app.Activity
+import android.content.res.Resources
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import com.example.weatherapp.adapters.DailyListAdapter
 import com.example.weatherapp.api.ApiService
 import com.example.weatherapp.api.retrofit
@@ -25,14 +30,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        addCities()
-
         prefs = AppPreferences(applicationContext)
+
+        val res: Resources = resources
+        val listOfCities = res.getStringArray(R.array.citiesList)
+
+        addCities()
+        showCities()
+        citiesSpinner.setSelection(listOfCities.indexOf(prefs!!.lastCityName))
+
         temperatureConverterButton.isChecked = prefs!!.celsiusOrFahrenheit
 
-        getTheResponseBody()
-
-        temperatureConverterButton.setOnCheckedChangeListener { whatIsThis, isChecked -> run {
+        temperatureConverterButton.setOnCheckedChangeListener { whatIsThis, isChecked ->
+            run {
                 setTemperature(
                     rezultatet,
                     0,
@@ -45,8 +55,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun showCities() {
+        ArrayAdapter.createFromResource(
+            this,
+            R.array.citiesList,
+            android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            citiesSpinner.adapter = adapter
+        }
+
+        class SpinnerActivity : Activity(), AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {
+
+                var emriQytetitTeSelektuar = parent.getItemAtPosition(pos).toString()
+                var qyteti = cities!!.find { it.cityName.equals(emriQytetitTeSelektuar) }
+
+                getTheResponseBody(qyteti!!.cityKey)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                //TO DO
+            }
+        }
+        citiesSpinner.onItemSelectedListener = SpinnerActivity()
+    }
+
     override fun onSaveInstanceState(outState: Bundle?) {
         prefs!!.celsiusOrFahrenheit = temperatureConverterButton.isChecked
+        prefs!!.lastCityName = citiesSpinner.selectedItem.toString()
         super.onSaveInstanceState(outState)
     }
 
@@ -70,16 +107,11 @@ class MainActivity : AppCompatActivity() {
         cities!!.add(newyorku)
         cities!!.add(londra)
         cities!!.add(stokholmi)
-
-        var qytetiGjetur = cities!!.find { it.cityKey.equals(prefs!!.lastCityKey) }
-
-        println("EMRI I QYTETIT = " + qytetiGjetur!!.cityName)
-        println("KEY I QYTETIT = " +qytetiGjetur.cityKey)
     }
 
-    private fun getTheResponseBody() {
+    private fun getTheResponseBody(cityKey: String?) {
         var call = retrofit.create(ApiService::class.java)
-            .getForecast("298740",THE_API_KEY)
+            .getForecast(cityKey.toString(), THE_API_KEY)
 
         call.enqueue(object : Callback<ResponseBody> {
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
@@ -90,7 +122,6 @@ class MainActivity : AppCompatActivity() {
                 println("MESAZHI = " + response.message())
                 println("KODI = " + response.code())
                 rezultatet = response.body()!!.dailyForecasts
-
 
                 setDayAndDate(rezultatet, 0, dataDheDitaTextView)
                 setTemperature(

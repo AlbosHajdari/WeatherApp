@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 
-public class DailyForecast{
+public class DailyForecast {
     @SerializedName("Date")
     @Expose
     var date: String? = null

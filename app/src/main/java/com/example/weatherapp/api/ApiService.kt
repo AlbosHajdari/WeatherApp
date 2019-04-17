@@ -11,7 +11,7 @@ interface ApiService {
 
     @GET("/forecasts/v1/daily/5day/{city}")
     fun getForecast(
-        @Path("city") qyteti:String,
+        @Path("city") qyteti: String,
         @Query("apikey") apiKey: String
     ): Call<ResponseBody>
 }

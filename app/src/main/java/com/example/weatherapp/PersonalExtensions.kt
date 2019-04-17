@@ -30,6 +30,7 @@ fun String.Companion.maximumFormatedValue(rezultatet: List<DailyForecast>, posit
 }
 
 fun setDayAndDate(rezultatet: List<DailyForecast>?, position: Int, ditaDheDataTextView: TextView) {
+
     var dataString: String = rezultatet!!.get(position).date!!
     val date = SimpleDateFormat("yyyy-MM-dd").parse(dataString)
 
@@ -52,8 +53,9 @@ fun setTemperature(
     maxTemperatureTextView: TextView,
     celsiusOrFahrenheit: Boolean
 ) {
-    if((rezultatet!!.get(0).temperature!!.minimum!!.unit.equals(celsius) and celsiusOrFahrenheit.equals(true)) or
-                (rezultatet!!.get(0).temperature!!.minimum!!.unit.equals(fahrenheit) and celsiusOrFahrenheit.equals(false))) {
+    if ((rezultatet!!.get(0).temperature!!.minimum!!.unit.equals(celsius) and celsiusOrFahrenheit.equals(true)) or
+        (rezultatet!!.get(0).temperature!!.minimum!!.unit.equals(fahrenheit) and celsiusOrFahrenheit.equals(false))
+    ) {
         if (celsiusOrFahrenheit) {
             changeValueAndUnitToFahrenheit(rezultatet)
         } else {
