@@ -22,8 +22,9 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity() {
     val THE_API_KEY: String = "11CRmW4yNP4icQrfiEcKaWVvXy0ocbA0"
     var rezultatet: List<DailyForecast>? = null
-    var cities: ArrayList<City>? = null
     var prefs: AppPreferences? = null
+    var listOfCities: Array<String>? = null
+    var listOfCitiesNames: ArrayList<String>? = null
     lateinit var adapterOne: DailyListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,11 +34,13 @@ class MainActivity : AppCompatActivity() {
         prefs = AppPreferences(applicationContext)
 
         val res: Resources = resources
-        val listOfCities = res.getStringArray(R.array.citiesList)
 
-        addCities()
+        listOfCities = res.getStringArray(R.array.citiesList) as Array<String>
+
+        gettingOnlyTheNamesOfCities()
+
         showCities()
-        citiesSpinner.setSelection(listOfCities.indexOf(prefs!!.lastCityName))
+        citiesSpinner.setSelection(listOfCitiesNames!!.indexOf(prefs!!.lastCity))
 
         temperatureConverterButton.isChecked = prefs!!.celsiusOrFahrenheit
 
@@ -55,23 +58,29 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun gettingOnlyTheNamesOfCities() {
+        listOfCitiesNames = ArrayList<String>()
+        for(i in 0..listOfCities!!.size-1){
+            var emriQytetit = listOfCities!!.get(i).split("|").get(0)
+            listOfCitiesNames!!.add(emriQytetit)
+        }
+    }
+
     private fun showCities() {
         ArrayAdapter.createFromResource(
             this,
             R.array.citiesList,
             android.R.layout.simple_spinner_item
-        ).also { adapter ->
+        ).also {
+            var adapter = ArrayAdapter<Any>(this, android.R.layout.simple_spinner_dropdown_item, listOfCitiesNames as List<Any>)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             citiesSpinner.adapter = adapter
         }
 
         class SpinnerActivity : Activity(), AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {
-
-                var emriQytetitTeSelektuar = parent.getItemAtPosition(pos).toString()
-                var qyteti = cities!!.find { it.cityName.equals(emriQytetitTeSelektuar) }
-
-                getTheResponseBody(qyteti!!.cityKey)
+                var qyteti = listOfCities!!.get(pos).split("|")
+                getTheResponseBody(qyteti.get(1))
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
@@ -83,30 +92,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle?) {
         prefs!!.celsiusOrFahrenheit = temperatureConverterButton.isChecked
-        prefs!!.lastCityName = citiesSpinner.selectedItem.toString()
+        prefs!!.lastCity = citiesSpinner.selectedItem.toString()
         super.onSaveInstanceState(outState)
-    }
-
-    private fun addCities() {
-
-        var prishtina = City("Prishtina", "298740")
-        var tirana = City("Tirana", "6522")
-        var shkupi = City("Skopje", "227397")
-        var roma = City("Rome", "213490")
-        var berlini = City("Berlin", "178087")
-        var newyorku = City("New York", "349727")
-        var londra = City("London", "328328")
-        var stokholmi = City("Stockholm", "314929")
-
-        cities = ArrayList<City>()
-        cities!!.add(prishtina)
-        cities!!.add(tirana)
-        cities!!.add(shkupi)
-        cities!!.add(roma)
-        cities!!.add(berlini)
-        cities!!.add(newyorku)
-        cities!!.add(londra)
-        cities!!.add(stokholmi)
     }
 
     private fun getTheResponseBody(cityKey: String?) {

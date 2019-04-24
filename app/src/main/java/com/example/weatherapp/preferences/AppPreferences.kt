@@ -14,7 +14,7 @@ class AppPreferences(context: Context) {
         get() = preferences!!.getBoolean(TEMPERATURE_CONVERTER_BUTTON_CELSIUS_OR_FAHRENHEIT, false)
         set(value) = preferences!!.edit().putBoolean(TEMPERATURE_CONVERTER_BUTTON_CELSIUS_OR_FAHRENHEIT, value).apply()
 
-    var lastCityName: String
-        get() = preferences!!.getString(LAST_CITY_NAME, "Prishtina")
+    var lastCity: String
+        get() = preferences!!.getString(LAST_CITY_NAME, "Prishtina|298740")
         set(value) = preferences!!.edit().putString(LAST_CITY_NAME, value).apply()
 }
