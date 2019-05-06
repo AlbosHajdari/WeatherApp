@@ -17,5 +17,4 @@ class RealFeelTemperature_ {
     @SerializedName("UnitType")
     @Expose
     val unitType: Int? = null
-
 }
