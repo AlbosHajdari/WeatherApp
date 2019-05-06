@@ -11,5 +11,4 @@ class ResponseBody {
     @SerializedName("DailyForecasts")
     @Expose
     var dailyForecasts: List<DailyForecast>? = null
-
 }
